@@ -1,0 +1,19 @@
+{
+  "presets": ["env", "react"],
+  "plugins": [
+    "transform-runtime",
+    "transform-decorators-legacy",
+    "transform-class-properties"
+  ],
+  
+  "env": {
+    "test": {
+      "plugins": [
+        "transform-runtime",
+        "transform-decorators-legacy",
+        "transform-class-properties",
+        "babel-plugin-webpack-alias"
+      ]
+    }
+  }
+}
