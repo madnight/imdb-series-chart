@@ -7,6 +7,7 @@
     "build": "webpack --config webpack.production.config.js --progress --profile --colors",
     "serve:build": "npm run build && node server.js",
     "start": "webpack-dev-server --progress --profile --colors",
+    "deploy": "npm run build && gulp deploy",
     "lint": "eslint --ext js --ext jsx src || exit 0",
     "dev": " webpack-dashboard -- webpack-dev-server",
     "test": "export NODE_ENV=test && jest"
@@ -22,6 +23,7 @@
     "babel-polyfill": "6.26.0",
     "babel-preset-stage-2": "^6.24.1",
     "chart.js": "^2.7.2",
+    "gulp": "^3.9.1",
     "highcharts": "^5.0.15",
     "imdb-api": "^3.1.2",
     "normalize.css": "^7.0.0",

@@ -12,6 +12,13 @@ loaders.push({
 });
 
 module.exports = {
+  node: {
+    fs: 'empty',
+    net: 'empty',
+    tls: 'empty',
+    dns: 'empty'
+  },
+
   entry: [
     './src/index.jsx'
   ],

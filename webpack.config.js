@@ -11,12 +11,12 @@ const PORT = process.env.PORT || "8888";
 
 
 module.exports = {
-node: {
-  fs: 'empty',
-  net: 'empty',
-  tls: 'empty',
-  dns: 'empty'
-},
+  node: {
+    fs: 'empty',
+    net: 'empty',
+    tls: 'empty',
+    dns: 'empty'
+  },
   entry: [
     // POLYFILL: Set up an ES6-ish environment
     // 'babel-polyfill',  // The entire babel-polyfill
