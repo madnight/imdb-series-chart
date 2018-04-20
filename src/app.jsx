@@ -59,9 +59,10 @@ class App extends Component {
       const getSeries = (id.charAt(0) == 't' && id.charAt(1) == 't') ? imdb.getById(id, options) : imdb.get(id, options)
       const series = await Promise.race([getSeries, timerPromise])
       const episodes = await series.episodes()
-      const ratings = episodes.map(e => parseFloat(e.rating))
+      const ratings = episodes.map(e => ({name: e.name, y: parseFloat(e.rating)}))
       const labels = episodes.map(e => e.name)
       const title = series.title
+      console.log(episodes)
       this.setState({ data: ratings, title: title, labels: labels, id: id });
     } catch (e) {
       this.setState({title: "invalid"})
@@ -137,7 +138,9 @@ class App extends Component {
             <Title>{this.state.title}</Title>
             <Subtitle>Source: www.omdbapi.com</Subtitle>
             <Legend layout="vertical" align="right" verticalAlign="middle" />
-            <Tooltip/>
+            <Tooltip headerFormat="<span style='font-size: 10px'>Episode {point.x}</span><br/>"
+                     pointFormat="<span style='color:{point.color}'></span> {point.name}: <b>{point.y}</b><br/>"
+            />
             <XAxis>
               <XAxis.Title>Episode</XAxis.Title>
             </XAxis>
