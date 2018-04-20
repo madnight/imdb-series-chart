@@ -60,7 +60,7 @@ class App extends Component {
     this.setState({id : event.target.value})
   }
   componentWillMount() {
-      this.getImdb()
+    this.getImdb()
   }
 
   render() {
@@ -80,14 +80,16 @@ class App extends Component {
             </YAxis>
           </HighchartsChart>
           <center>
-
- <div class="input-field col s12">
-          <input id="input" type="text" onChange={this.updateInput} onKeyPress={(e) => (e.key === 'Enter') && this.getImdb()}></input>
-          <label for="input">Series (e.g. Lost or IMDB id)</label>
+            <div class="row">
+            <div style={ {width: '50%'} }>
+              <div class="input-field col s12" >
+                <input id="input" type="text" onChange={this.updateInput} onKeyPress={(e) => (e.key === 'Enter') && this.getImdb()}></input>
+                <label for="input">Series (e.g. Lost or IMDB id)</label>
+              </div>
+              </div>
+            </div>
+          </center>
         </div>
-        </center>
-        </div>
-
       </div>
     )
   }
