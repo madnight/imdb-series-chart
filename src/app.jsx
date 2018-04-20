@@ -8,7 +8,8 @@ import Highcharts from 'highcharts'
 import {
   HighchartsChart, Chart, withHighcharts, XAxis, YAxis, Title, Subtitle, Legend, LineSeries, SplineSeries
 } from 'react-jsx-highcharts'
-import { Line } from 'react-chartjs-2';
+import { Line } from 'react-chartjs-2'
+import Timeout from 'await-timeout'
 
 const plotOptions = {
   spline: {
@@ -43,15 +44,20 @@ class App extends Component {
     this.getImdb = this.getImdb.bind(this)
     this.loader = this.loader.bind(this)
     this.movieNotFound = this.movieNotFound.bind(this)
+    this.focusUsernameInputField = this.focusUsernameInputField.bind(this)
+    this.render = this.render.bind(this)
   }
 
   async getImdb() {
     this.setState({title: ""})
     const imdb = require('imdb-api')
     const id = this.state.id
-    const options = {apiKey: 'db3828ef', timeout: 30000}
+    const options = {apiKey: 'db3828ef', timeout: 10000}
+    const timeout = new Timeout()
     try {
-      const series = (id.charAt(0) == 't' && id.charAt(1) == 't') ? await imdb.getById(id, options) : await imdb.get(id, options)
+      const timerPromise = timeout.set(5000, 'Timeout!');
+      const getSeries = (id.charAt(0) == 't' && id.charAt(1) == 't') ? imdb.getById(id, options) : imdb.get(id, options)
+      const series = await Promise.race([getSeries, timerPromise])
       const episodes = await series.episodes()
       const ratings = episodes.map(e => parseFloat(e.rating))
       const labels = episodes.map(e => e.name)
@@ -59,6 +65,8 @@ class App extends Component {
       this.setState({ data: ratings, title: title, labels: labels, id: id });
     } catch (e) {
       this.setState({title: "invalid"})
+    } finally {
+      timeout.clear();
     }
   }
 
@@ -68,6 +76,17 @@ class App extends Component {
 
   componentWillMount() {
     this.getImdb()
+  }
+
+  componentDidMount() {
+    if (this.nameInput) this.nameInput.focus()
+    else console.log("shoot")
+  }
+
+  focusUsernameInputField(input) {
+    if (input) {
+      setTimeout(() => {input.focus()}, 100);
+    }
   }
 
   loader() {
@@ -82,22 +101,29 @@ class App extends Component {
     )
   }
 
-  movieNotFound() {
+  input() {
     return (
       <center>
-        <div style={ {width: '70%', marginTop: 200} }>
-          <h1>Movie not Found!</h1>
-        </div>
         <div class="row">
           <div style={ {width: '50%'} }>
             <div class="input-field col s12" >
-              <input id="input" type="text" onChange={this.updateInput} onKeyPress={(e) => {  if (e.key === 'Enter') this.getImdb() }}></input>
+              <input id="input" type="text" ref={this.focusUsernameInputField} onChange={this.updateInput} onKeyPress={(e) => { if (e.key === 'Enter') this.getImdb() }}></input>
               <label for="input">Series (e.g. Lost or IMDB id)</label>
             </div>
           </div>
         </div>
       </center>
     )
+  }
+  movieNotFound() {
+    return [
+      <center>
+        <div style={ {width: '70%', marginTop: 200} }>
+          <h1>Movie not Found!</h1>
+        </div>
+      </center>,
+      this.input()
+    ]
   }
 
   render() {
@@ -118,16 +144,7 @@ class App extends Component {
               <SplineSeries id="imdb" name={this.state.title} data={this.state.data} />
             </YAxis>
           </HighchartsChart>
-          <center>
-            <div class="row">
-              <div style={ {width: '50%'} }>
-                <div class="input-field col s12" >
-                  <input id="input" type="text" onChange={this.updateInput} onKeyPress={(e) => {  if (e.key === 'Enter') this.getImdb() }}></input>
-                  <label for="input">Series (e.g. Lost or IMDB id)</label>
-                </div>
-              </div>
-            </div>
-          </center>
+          {this.input()}
         </div>
       </div>
     )
