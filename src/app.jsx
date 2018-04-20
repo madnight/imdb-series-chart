@@ -6,7 +6,7 @@ import "styles/base/_common.sass"  // Global styles
 import styles from "./app.sass"  // Css-module styles
 import Highcharts from 'highcharts'
 import {
-  HighchartsChart, Chart, withHighcharts, XAxis, YAxis, Title, Subtitle, Legend, LineSeries, SplineSeries
+  HighchartsChart, Chart, withHighcharts, XAxis, YAxis, Title, Subtitle, Legend, LineSeries, SplineSeries, Tooltip
 } from 'react-jsx-highcharts'
 import { Line } from 'react-chartjs-2'
 import Timeout from 'await-timeout'
@@ -27,7 +27,7 @@ const plotOptions = {
   series: {
     showInLegend: false,
     pointStart: 1
-  }
+  },
 };
 
 class App extends Component {
@@ -137,6 +137,7 @@ class App extends Component {
             <Title>{this.state.title}</Title>
             <Subtitle>Source: www.omdbapi.com</Subtitle>
             <Legend layout="vertical" align="right" verticalAlign="middle" />
+            <Tooltip/>
             <XAxis>
               <XAxis.Title>Episode</XAxis.Title>
             </XAxis>
