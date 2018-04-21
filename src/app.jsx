@@ -11,6 +11,7 @@ import {
 import { Line } from 'react-chartjs-2'
 import Timeout from 'await-timeout'
 
+const memoize = require('fast-memoize')
 const imdb = require('imdb-api')
 
 const plotOptions = {
@@ -61,7 +62,17 @@ class App extends Component {
       const getSeries = (id.charAt(0) == 't' && id.charAt(1) == 't') ? imdb.getById(id, options) : imdb.get(id, options)
       const series = await Promise.race([getSeries, timerPromise])
       const episodes = await Promise.race([series.episodes(), timerPromise])
-      const ratings = episodes.map(e => ({name: e.name, y: parseFloat(e.rating)}))
+      const pad = (number, digits) =>
+        Array(Math.max(digits - String(number).length + 1, 0)).join(0) + number
+
+      const randomColor = memoize((i) => `#${Math.floor(Math.random() * 0x1000000).toString(16).padStart(6, 0)}`)
+      const ratings = episodes.map(e => ({
+        name: e.name,
+        episode: pad(e.episode, 2),
+        season: pad(e.season, 2),
+        y: parseFloat(e.rating),
+        marker: { fillColor: randomColor(e.season) }
+      }))
       const labels = episodes.map(e => e.name)
       const title = series.title
       this.setState({ data: ratings, title: title, labels: labels, id: id });
@@ -107,9 +118,15 @@ class App extends Component {
     return (
       <center>
         <div className="row">
-          <div style={ {width: '50%'} }>
+          <div style={ {width: '40%', marginTop: 40 } }>
             <div className="input-field col s12" >
-              <input id="input" type="text" ref={this.focusUsernameInputField} onChange={this.updateInput} onKeyPress={(e) => { if (e.key === 'Enter') this.getImdb() }}></input>
+              <input
+                id="input"
+                type="text"
+                ref={this.focusUsernameInputField}
+                onChange={this.updateInput}
+                onKeyPress={(e) => e.key === 'Enter' && this.getImdb() }>
+              </input>
               <label htmlFor="input">Series (e.g. Lost or IMDB id)</label>
             </div>
           </div>
@@ -117,6 +134,7 @@ class App extends Component {
       </center>
     )
   }
+
   movieNotFound() {
     return [
       <center>
@@ -134,24 +152,28 @@ class App extends Component {
     return (
       <div className='App'>
         <div>
-          <HighchartsChart plotOptions={plotOptions}>
-            <Chart />
-            <Title>{this.state.title}</Title>
-            <Subtitle>Source: www.omdbapi.com</Subtitle>
-            <Legend layout="vertical" align="right" verticalAlign="middle" />
-            <Tooltip headerFormat="<span style='font-size: 10px'>Episode {point.x}</span><br/>"
-                     pointFormat="<span style='color:{point.color}'></span> {point.name}: <b>{point.y}</b><br/>"
-            />
-            <XAxis>
-              <XAxis.Title>Episode</XAxis.Title>
-            </XAxis>
-            <YAxis id="number">
-              <SplineSeries id="imdb" name={this.state.title} data={this.state.data} />
-            </YAxis>
-          </HighchartsChart>
-          {this.input()}
+          <center>
+            <div style={ {width: '90%', marginTop: 20 } }>
+              <HighchartsChart plotOptions={plotOptions}>
+                <Chart />
+                <Title>{this.state.title}</Title>
+                <Subtitle>Source: www.omdbapi.com</Subtitle>
+                <Legend layout="vertical" align="right" verticalAlign="middle" />
+                <Tooltip headerFormat="<span style='font-size: 10px'></span>"
+                  pointFormat="<span style='color:{point.color}'></span> S{point.season}E{point.episode} <i>{point.name}</i><br> <b>Rating: {point.y}</b><br/>"
+                  />
+                  <XAxis>
+                    <XAxis.Title>Episode</XAxis.Title>
+                  </XAxis>
+                  <YAxis id="number">
+                    <SplineSeries id="imdb" name={this.state.title} data={this.state.data} />
+                  </YAxis>
+                </HighchartsChart>
+                {this.input()}
+              </div>
+            </center>
+          </div>
         </div>
-      </div>
     )
   }
 }
