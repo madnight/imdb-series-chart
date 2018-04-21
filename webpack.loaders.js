@@ -138,6 +138,24 @@ module.exports = [
       }
     ]
   },
+  // ==========
+  // = Styles =
+  // ==========
+  // Global CSS (from node_modules)
+  // ==============================
+  {
+    test: /\.css/,
+    include: path.resolve(__dirname, 'src'),
+    use: [
+      {
+        loader: "style-loader"
+      },
+      {
+        loader: 'css-loader'
+      }
+    ]
+  },
+
   // Global SASS (from app)
   // ===============================
   // Do not modularize these imports
