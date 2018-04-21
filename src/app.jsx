@@ -11,6 +11,8 @@ import {
 import { Line } from 'react-chartjs-2'
 import Timeout from 'await-timeout'
 
+const imdb = require('imdb-api')
+
 const plotOptions = {
   spline: {
     lineWidth: 0,
@@ -50,19 +52,18 @@ class App extends Component {
 
   async getImdb() {
     this.setState({title: ""})
-    const imdb = require('imdb-api')
     const id = this.state.id
-    const options = {apiKey: 'db3828ef', timeout: 10000}
+    const apiTimeout = 30 * 1000
+    const options = {apiKey: 'db3828ef', timeout: apiTimeout}
     const timeout = new Timeout()
     try {
-      const timerPromise = timeout.set(5000, 'Timeout!');
+      const timerPromise = timeout.set(apiTimeout, 'Timeout!');
       const getSeries = (id.charAt(0) == 't' && id.charAt(1) == 't') ? imdb.getById(id, options) : imdb.get(id, options)
       const series = await Promise.race([getSeries, timerPromise])
-      const episodes = await series.episodes()
+      const episodes = await Promise.race([series.episodes(), timerPromise])
       const ratings = episodes.map(e => ({name: e.name, y: parseFloat(e.rating)}))
       const labels = episodes.map(e => e.name)
       const title = series.title
-      console.log(episodes)
       this.setState({ data: ratings, title: title, labels: labels, id: id });
     } catch (e) {
       this.setState({title: "invalid"})
@@ -81,12 +82,11 @@ class App extends Component {
 
   componentDidMount() {
     if (this.nameInput) this.nameInput.focus()
-    else console.log("shoot")
   }
 
   focusUsernameInputField(input) {
     if (input) {
-      setTimeout(() => {input.focus()}, 100);
+      setTimeout(() => { input.focus() }, 100)
     }
   }
 
@@ -94,8 +94,9 @@ class App extends Component {
     return (
       <center>
         <div style={ {width: '70%', marginTop: 200} }>
-          <div class="progress">
-            <div class="indeterminate"></div>
+          <h5>Processing Request. This may take up to 30 seconds...</h5><br></br>
+          <div className="progress">
+            <div className="indeterminate"></div>
           </div>
         </div>
       </center>
@@ -105,11 +106,11 @@ class App extends Component {
   input() {
     return (
       <center>
-        <div class="row">
+        <div className="row">
           <div style={ {width: '50%'} }>
-            <div class="input-field col s12" >
+            <div className="input-field col s12" >
               <input id="input" type="text" ref={this.focusUsernameInputField} onChange={this.updateInput} onKeyPress={(e) => { if (e.key === 'Enter') this.getImdb() }}></input>
-              <label for="input">Series (e.g. Lost or IMDB id)</label>
+              <label htmlFor="input">Series (e.g. Lost or IMDB id)</label>
             </div>
           </div>
         </div>
@@ -120,7 +121,7 @@ class App extends Component {
     return [
       <center>
         <div style={ {width: '70%', marginTop: 200} }>
-          <h1>Movie not Found!</h1>
+          <h1>TV Show not Found!</h1>
         </div>
       </center>,
       this.input()
@@ -154,4 +155,4 @@ class App extends Component {
     )
   }
 }
-export default withHighcharts(App, Highcharts);
+export default withHighcharts(App, Highcharts)
