@@ -7,7 +7,7 @@
     "build": "webpack --config webpack.production.config.js --progress --profile --colors",
     "serve:build": "npm run build && node server.js",
     "start": "webpack-dev-server --progress --profile --colors",
-    "deploy": "gulp deploy",
+    "deploy": "npm run build && gulp deploy",
     "lint": "eslint --ext js --ext jsx src || exit 0",
     "dev": " webpack-dashboard -- webpack-dev-server",
     "test": "export NODE_ENV=test && jest"
