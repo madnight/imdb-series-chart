@@ -5,8 +5,8 @@ import "styles/base/_main.sass"  // Global styles
 import "styles/base/_common.sass"  // Global styles
 import styles from "./app.css"  // Css-module styles
 import Highcharts from 'highcharts'
-import {
-  HighchartsChart, Chart, withHighcharts, XAxis, YAxis, Title, Subtitle, Legend, LineSeries, SplineSeries, Tooltip
+import { HighchartsChart, Chart, withHighcharts, XAxis, YAxis, Title,
+  Subtitle, Legend, LineSeries, SplineSeries, Tooltip, Loading
 } from 'react-jsx-highcharts'
 import { Line } from 'react-chartjs-2'
 import Timeout from 'await-timeout'
@@ -46,7 +46,6 @@ class App extends Component {
     this.updateInput = this.updateInput.bind(this)
     this.getImdb = this.getImdb.bind(this)
     this.loader = this.loader.bind(this)
-    this.movieNotFound = this.movieNotFound.bind(this)
     this.focusUsernameInputField = this.focusUsernameInputField.bind(this)
     this.render = this.render.bind(this)
   }
@@ -77,7 +76,7 @@ class App extends Component {
       const title = series.title
       this.setState({ data: ratings, title: title, labels: labels, id: id });
     } catch (e) {
-      this.setState({title: "invalid"})
+      this.setState({title: "TV Show not found!"})
     } finally {
       timeout.clear();
     }
@@ -135,43 +134,32 @@ class App extends Component {
     )
   }
 
-  movieNotFound() {
-    return [
-      <center>
-        <div style={ {width: '70%', marginTop: 200} }>
-          <h1>TV Show not Found!</h1>
-        </div>
-      </center>,
-      this.input()
-    ]
-  }
-
   render() {
-    if (!this.state.title) return this.loader()
-    if (this.state.title == "invalid") return this.movieNotFound()
     return (
       <div className='App'>
         <div>
           <center>
             <div style={ {width: '90%', marginTop: 20 } }>
               <HighchartsChart plotOptions={plotOptions}>
-                <Chart />
+                <Loading isLoading={!this.state.title}>{ 'Fetching data...' }</Loading>
+                <Loading isLoading={this.state.title == "TV Show not found!"}>{ "<h1>TV Show not found!</h1>" }</Loading>
+                <Chart backgroundColor={null}/>
                 <Title>{this.state.title}</Title>
                 <Subtitle>Source: www.omdbapi.com</Subtitle>
                 <Legend layout="vertical" align="right" verticalAlign="middle" />
                 <Tooltip headerFormat="<span style='font-size: 10px'></span>"
                   pointFormat="<span style='color:{point.color}'></span> S{point.season}E{point.episode} <i>{point.name}</i><br> <b>Rating: {point.y}</b><br/>"
-                  />
-                  <XAxis>
-                    <XAxis.Title>Episode</XAxis.Title>
-                  </XAxis>
-                  <YAxis id="number">
-                    <SplineSeries id="imdb" name={this.state.title} data={this.state.data} />
-                  </YAxis>
-                </HighchartsChart>
-                {this.input()}
-              </div>
-            </center>
+      />
+      <XAxis>
+        <XAxis.Title>Episode</XAxis.Title>
+      </XAxis>
+      <YAxis id="number">
+        <SplineSeries id="imdb" name={this.state.title} data={this.state.data} />
+      </YAxis>
+    </HighchartsChart>
+    {this.input()}
+  </div>
+</center>
           </div>
         </div>
     )
