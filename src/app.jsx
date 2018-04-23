@@ -40,20 +40,21 @@ class App extends Component {
       labels: [],
       title: '',
       data: [],
-      id: "tt0141842"
+      id: ""
     };
 
-    this.updateInput = this.updateInput.bind(this)
     this.getImdb = this.getImdb.bind(this)
-    this.loader = this.loader.bind(this)
-    this.focusUsernameInputField = this.focusUsernameInputField.bind(this)
     this.render = this.render.bind(this)
   }
 
-  async getImdb() {
-    this.setState({title: ""})
-    const id = this.state.id
-    const apiTimeout = 30 * 1000
+  async getImdb(id) {
+    if (id == this.state.id)
+      return
+    console.log(id)
+    console.log(this.state.id)
+    console.log(id == this.state.id)
+    this.setState({ data: [], title: "", labels: "" })
+    const apiTimeout = 5 * 1000
     const options = {apiKey: 'db3828ef', timeout: apiTimeout}
     const timeout = new Timeout()
     try {
@@ -76,41 +77,19 @@ class App extends Component {
       const title = series.title
       this.setState({ data: ratings, title: title, labels: labels, id: id });
     } catch (e) {
-      this.setState({title: "TV Show not found!"})
+      this.setState({title: "TV Show not found!", id: id})
     } finally {
       timeout.clear();
     }
   }
 
-  updateInput(event){
-    this.setState({id : event.target.value})
-  }
-
   componentWillMount() {
-    this.getImdb()
+    if (!this.state.title)
+      this.getImdb("tt0141842")
   }
 
   componentDidMount() {
     if (this.nameInput) this.nameInput.focus()
-  }
-
-  focusUsernameInputField(input) {
-    if (input) {
-      setTimeout(() => { input.focus() }, 100)
-    }
-  }
-
-  loader() {
-    return (
-      <center>
-        <div style={ {width: '70%', marginTop: 200} }>
-          <h5>Processing Request. This may take up to 30 seconds...</h5><br></br>
-          <div className="progress">
-            <div className="indeterminate"></div>
-          </div>
-        </div>
-      </center>
-    )
   }
 
   input() {
@@ -122,9 +101,8 @@ class App extends Component {
               <input
                 id="input"
                 type="text"
-                ref={this.focusUsernameInputField}
-                onChange={this.updateInput}
-                onKeyPress={(e) => e.key === 'Enter' && this.getImdb() }>
+                ref={ i => i && setTimeout(() => { input.focus() }, 100) }
+                onKeyPress={ e => e.key === 'Enter' && this.getImdb(e.target.value) }>
               </input>
               <label htmlFor="input">Series (e.g. Lost or IMDB id)</label>
             </div>
