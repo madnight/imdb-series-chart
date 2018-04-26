@@ -1,5 +1,5 @@
 <p align="center">
-    <h2 align="center">IMDB Series Chart<br></h2>
+    <h1 align="center">IMDB Series Chart<br></h1>
 </p><br><br>
 
 
