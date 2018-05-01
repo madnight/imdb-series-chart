@@ -6,7 +6,7 @@ import "styles/base/_common.sass"  // Global styles
 import styles from "./app.css"  // Css-module styles
 import Highcharts from 'highcharts'
 import { HighchartsChart, Chart, withHighcharts, XAxis, YAxis, Title,
-  Subtitle, Legend, LineSeries, SplineSeries, Tooltip, Loading
+    Subtitle, Legend, LineSeries, SplineSeries, Tooltip, Loading
 } from 'react-jsx-highcharts'
 import { Line } from 'react-chartjs-2'
 import Timeout from 'await-timeout'
@@ -16,159 +16,167 @@ const memoize = require('fast-memoize')
 const imdb = require('imdb-api')
 
 const plotOptions = {
-  spline: {
-    lineWidth: 0,
-    states: {
-      hover: {
-        lineWidth: 0
-      }
+    spline: {
+        lineWidth: 0,
+        states: {
+            hover: {
+                lineWidth: 0
+            }
+        },
+        marker: {
+            enabled: true,
+            fillColor: "#FF69B4"
+        },
     },
-    marker: {
-      enabled: true,
-      fillColor: "#FF69B4"
+    series: {
+        showInLegend: false,
+        pointStart: 1
     },
-  },
-  series: {
-    showInLegend: false,
-    pointStart: 1
-  },
 }
 
 class App extends Component {
-  constructor() {
-    super()
-    this.state = {
-      labels: [],
-      title: '',
-      data: [],
-      id: ""
+    constructor() {
+        super()
+        this.state = {
+            labels: [],
+            title: '',
+            data: [],
+            id: ''
+        }
+        this.apiTimeout = 20 * 1000
+        this.options = {apiKey: 'db3828ef', timeout: this.apiTimeout}
+        this.timeout = new Timeout()
+        this.defaultTitle = "tt0141842" // The Sopranos
     }
 
-    this.getImdb = this.getImdb.bind(this)
-    this.render = this.render.bind(this)
-  }
-
-  async getImdb(id) {
-    if (id == this.state.id)
-      return
-    console.log(id)
-    console.log(this.state.id)
-    console.log(id == this.state.id)
-    this.setState({ data: [], title: "", labels: "" })
-    const apiTimeout = 5 * 1000
-    const options = {apiKey: 'db3828ef', timeout: apiTimeout}
-    const timeout = new Timeout()
-    try {
-      const timerPromise = timeout.set(apiTimeout, 'Timeout!')
-      const getSeries = (id.charAt(0) == 't' && id.charAt(1) == 't') ?
-        imdb.getById(id, options) : imdb.get(id, options)
-      const series = await Promise.race([getSeries, timerPromise])
-      const episodes = await Promise.race([series.episodes(), timerPromise])
-      const pad = (number, digits) =>
-        Array(Math.max(digits - String(number).length + 1, 0)).join(0) + number
-
-      const randomColor = memoize((i) =>
-        `#${Math.floor(Math.random() * 0x1000000).toString(16).padStart(6, 0)}`)
-      const ratings = episodes.map(e => ({
-        name: e.name,
-        episode: pad(e.episode, 2),
-        season: pad(e.season, 2),
-        y: parseFloat(e.rating),
-        marker: { fillColor: randomColor(e.season) }
-      }))
-      const labels = episodes.map(e => e.name)
-      const title = series.title
-      this.setState({ data: ratings, title: title, labels: labels, id: id })
-    } catch (e) {
-      this.setState({title: "TV Show not found!", id: id})
-    } finally {
-      timeout.clear()
+    getSeries(id) {
+        return id.substring(0, 2) == 'tt' ?
+            imdb.getById(id, this.options) : imdb.get(id, this.options)
     }
-  }
 
-  componentWillMount() {
-    if (!this.state.title)
-      this.getImdb("tt0141842")
-  }
+    async getImdb(id) {
+        if (id == this.state.id) return
+        this.setState({ data: [], title: '', labels: '' })
 
-  componentDidMount() {
-    if (this.nameInput) this.nameInput.focus()
-  }
+        try {
+            const timerPromise = this.timeout.set(this.apiTimeout, 'Timeout!')
+            const series = await Promise.race([this.getSeries(id), timerPromise])
+            const episodes = await Promise.race([series.episodes(), timerPromise])
 
-  input() {
-    return (
-      <center>
-        <div className="row">
-          <div style={ {
-            width: '40%',
-            marginTop: 40 ,
-            '@media (max-width: 768px)': {
-              width: '80%',
-            }
-          } }>
-      <div className="input-field col s12" >
-        <input
-          id="input"
-          type="text"
-          ref={ i => i && setTimeout(() => { input.focus() }, 100) }
-          onKeyPress={ e =>
-              e.key === 'Enter' && this.getImdb(e.target.value) }>
-            </input>
-            <label htmlFor="input">Series (e.g. Lost or IMDB id)</label>
-          </div>
-        </div>
-      </div>
-    </center>
-    )
-  }
+            const pad = (number, digits) =>
+                Array(Math.max(digits - String(number).length + 1, 0)).join(0) + number
 
-  render() {
-    const pointFmt = "<span style='color:{point.color}'></span>" +
-      " S{point.season}E{point.episode} <i>{point.name}</i><br>" +
-      " <b>Rating: {point.y}</b><br/>"
-    return (
-      <div className='App'>
-        <div>
-          <center>
-            <div style={ {
-              width: '90%',
-              marginTop: 20,
-              '@media (max-width: 768px)': {
-                width: '100%',
-              }
-              } }>
-              <HighchartsChart plotOptions={plotOptions}>
-                <Loading isLoading={!this.state.title}>
-                  { 'Fetching data...' }
-                </Loading>
-                <Loading isLoading={this.state.title == "TV Show not found!"}>
-                  { "<h1>TV Show not found!</h1>" }
-                </Loading>
-                <Chart backgroundColor={null}/>
-                <Title>{this.state.title}</Title>
-                <Subtitle>Source: www.omdbapi.com</Subtitle>
-                <Legend layout="vertical" align="right" verticalAlign="middle"/>
-                <Tooltip
-                  headerFormat="<span style='font-size: 10px'></span>"
-                  pointFormat={pointFmt}
-                />
-                <XAxis>
-                  <XAxis.Title>Episode</XAxis.Title>
-                </XAxis>
-                <YAxis id="number">
-                  <SplineSeries
-                    id="imdb"
-                    name={this.state.title}
-                    data={this.state.data}/>
-                </YAxis>
-              </HighchartsChart>
-              {this.input()}
+            const randomColor = memoize((i) =>
+                `#${Math.floor(Math.random() * 0x1000000).toString(16).padStart(6, 0)}`)
+
+            const ratings = episodes.map(e => ({
+                name: e.name,
+                episode: pad(e.episode, 2),
+                season: pad(e.season, 2),
+                y: parseFloat(e.rating),
+                marker: { fillColor: randomColor(e.season) }
+            }))
+
+            this.setState({
+                data: ratings,
+                title: series.title,
+                labels: episodes.map(e => e.name),
+                id: id
+            })
+        } catch (e) {
+            this.setState({title: "TV Show not found!", id: id})
+        } finally {
+            this.timeout.clear()
+        }
+    }
+
+    componentWillMount() {
+        if (!this.state.title) this.getImdb(this.defaultTitle)
+    }
+
+    componentDidMount() {
+        if (this.nameInput) this.nameInput.focus()
+    }
+
+    input() {
+        return (
+            <center>
+                <div className="row">
+                    <div style={ {
+                        width: '40%',
+                        marginTop: 40 ,
+                        '@media (max-width: 768px)': {
+                            width: '80%',
+                        }
+                    } }>
+                    <div className="input-field col s12" >
+                        <input
+                            id="input"
+                            type="text"
+                            ref={ i => i && setTimeout(() => { input.focus() }, 100) }
+                            onKeyPress={ e =>
+                                    e.key === 'Enter' && this.getImdb(e.target.value) }>
+                                </input>
+                                <label htmlFor="input">Series (e.g. Lost or IMDB id)</label>
+                            </div>
+                        </div>
+                    </div>
+                </center>
+        )
+    }
+
+    render() {
+        const pointFmt = "<span style='color:{point.color}'></span>" +
+            " S{point.season}E{point.episode} <i>{point.name}</i><br>" +
+            " <b>Rating: {point.y}</b><br/>"
+        return (
+            <div className='App'>
+                <div>
+                    <center>
+                        <div style={ {
+                            width: '90%',
+                            marginTop: 20,
+                            '@media (max-width: 768px)': {
+                                width: '100%',
+                            }
+                        } }>
+                        <HighchartsChart plotOptions={plotOptions}>
+                            <Loading isLoading={!this.state.title}>
+                                { 'Fetching data...' }
+                            </Loading>
+                            <Loading
+                                isLoading={
+                                    this.state.title == "TV Show not found!"}>
+                                { "<h1>TV Show not found!</h1>" }
+                            </Loading>
+                            <Chart backgroundColor={null}/>
+                            <Title>{this.state.title}</Title>
+                            <Subtitle>Source: www.omdbapi.com</Subtitle>
+                            <Legend
+                                layout="vertical"
+                                align="right"
+                                verticalAlign="middle"/>
+                            <Tooltip
+                                headerFormat="<span style='font-size: 10px'></span>"
+                                pointFormat={pointFmt}
+                            />
+                            <XAxis>
+                                <XAxis.Title>Episode</XAxis.Title>
+                            </XAxis>
+                            <YAxis id="number">
+                                <SplineSeries
+                                    id="imdb"
+                                    name={this.state.title}
+                                    data={this.state.data}/>
+                            </YAxis>
+                        </HighchartsChart>
+                        {this.input()}
+                    </div>
+                </center>
             </div>
-          </center>
         </div>
-      </div>
-    )
-  }
+        )
+    }
 }
 
 export default withHighcharts(Radium(App), Highcharts)
