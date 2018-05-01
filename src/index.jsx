@@ -9,14 +9,14 @@ const renderApp = (Component) => {
       <Component/>
     </AppContainer>,
     document.getElementById('app')
-  );
-};
+  )
+}
 
-renderApp(Routes);
+renderApp(Routes)
 
 // Webpack Hot Module Replacement API
 if (module.hot) {
   module.hot.accept('./routes', () => {
-    renderApp(require('./routes').default);
+    renderApp(require('./routes').default)
   })
 }

@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import Navigation from './components/Navigation'
-import 'normalize.css';
+import 'normalize.css'
 import "styles/base/_main.sass"  // Global styles
 import "styles/base/_common.sass"  // Global styles
 import styles from "./app.css"  // Css-module styles
@@ -10,6 +10,7 @@ import { HighchartsChart, Chart, withHighcharts, XAxis, YAxis, Title,
 } from 'react-jsx-highcharts'
 import { Line } from 'react-chartjs-2'
 import Timeout from 'await-timeout'
+import Radium from 'radium'
 
 const memoize = require('fast-memoize')
 const imdb = require('imdb-api')
@@ -31,7 +32,7 @@ const plotOptions = {
     showInLegend: false,
     pointStart: 1
   },
-};
+}
 
 class App extends Component {
   constructor() {
@@ -41,7 +42,7 @@ class App extends Component {
       title: '',
       data: [],
       id: ""
-    };
+    }
 
     this.getImdb = this.getImdb.bind(this)
     this.render = this.render.bind(this)
@@ -58,14 +59,16 @@ class App extends Component {
     const options = {apiKey: 'db3828ef', timeout: apiTimeout}
     const timeout = new Timeout()
     try {
-      const timerPromise = timeout.set(apiTimeout, 'Timeout!');
-      const getSeries = (id.charAt(0) == 't' && id.charAt(1) == 't') ? imdb.getById(id, options) : imdb.get(id, options)
+      const timerPromise = timeout.set(apiTimeout, 'Timeout!')
+      const getSeries = (id.charAt(0) == 't' && id.charAt(1) == 't') ?
+        imdb.getById(id, options) : imdb.get(id, options)
       const series = await Promise.race([getSeries, timerPromise])
       const episodes = await Promise.race([series.episodes(), timerPromise])
       const pad = (number, digits) =>
         Array(Math.max(digits - String(number).length + 1, 0)).join(0) + number
 
-      const randomColor = memoize((i) => `#${Math.floor(Math.random() * 0x1000000).toString(16).padStart(6, 0)}`)
+      const randomColor = memoize((i) =>
+        `#${Math.floor(Math.random() * 0x1000000).toString(16).padStart(6, 0)}`)
       const ratings = episodes.map(e => ({
         name: e.name,
         episode: pad(e.episode, 2),
@@ -75,11 +78,11 @@ class App extends Component {
       }))
       const labels = episodes.map(e => e.name)
       const title = series.title
-      this.setState({ data: ratings, title: title, labels: labels, id: id });
+      this.setState({ data: ratings, title: title, labels: labels, id: id })
     } catch (e) {
       this.setState({title: "TV Show not found!", id: id})
     } finally {
-      timeout.clear();
+      timeout.clear()
     }
   }
 
@@ -96,51 +99,76 @@ class App extends Component {
     return (
       <center>
         <div className="row">
-          <div style={ {width: '40%', marginTop: 40 } }>
-            <div className="input-field col s12" >
-              <input
-                id="input"
-                type="text"
-                ref={ i => i && setTimeout(() => { input.focus() }, 100) }
-                onKeyPress={ e => e.key === 'Enter' && this.getImdb(e.target.value) }>
-              </input>
-              <label htmlFor="input">Series (e.g. Lost or IMDB id)</label>
-            </div>
+          <div style={ {
+            width: '40%',
+            marginTop: 40 ,
+            '@media (max-width: 768px)': {
+              width: '80%',
+            }
+          } }>
+      <div className="input-field col s12" >
+        <input
+          id="input"
+          type="text"
+          ref={ i => i && setTimeout(() => { input.focus() }, 100) }
+          onKeyPress={ e =>
+              e.key === 'Enter' && this.getImdb(e.target.value) }>
+            </input>
+            <label htmlFor="input">Series (e.g. Lost or IMDB id)</label>
           </div>
         </div>
-      </center>
+      </div>
+    </center>
     )
   }
 
   render() {
+    const pointFmt = "<span style='color:{point.color}'></span>" +
+      " S{point.season}E{point.episode} <i>{point.name}</i><br>" +
+      " <b>Rating: {point.y}</b><br/>"
     return (
       <div className='App'>
         <div>
           <center>
-            <div style={ {width: '90%', marginTop: 20 } }>
+            <div style={ {
+              width: '90%',
+              marginTop: 20,
+              '@media (max-width: 768px)': {
+                width: '100%',
+              }
+              } }>
               <HighchartsChart plotOptions={plotOptions}>
-                <Loading isLoading={!this.state.title}>{ 'Fetching data...' }</Loading>
-                <Loading isLoading={this.state.title == "TV Show not found!"}>{ "<h1>TV Show not found!</h1>" }</Loading>
+                <Loading isLoading={!this.state.title}>
+                  { 'Fetching data...' }
+                </Loading>
+                <Loading isLoading={this.state.title == "TV Show not found!"}>
+                  { "<h1>TV Show not found!</h1>" }
+                </Loading>
                 <Chart backgroundColor={null}/>
                 <Title>{this.state.title}</Title>
                 <Subtitle>Source: www.omdbapi.com</Subtitle>
-                <Legend layout="vertical" align="right" verticalAlign="middle" />
-                <Tooltip headerFormat="<span style='font-size: 10px'></span>"
-                  pointFormat="<span style='color:{point.color}'></span> S{point.season}E{point.episode} <i>{point.name}</i><br> <b>Rating: {point.y}</b><br/>"
-      />
-      <XAxis>
-        <XAxis.Title>Episode</XAxis.Title>
-      </XAxis>
-      <YAxis id="number">
-        <SplineSeries id="imdb" name={this.state.title} data={this.state.data} />
-      </YAxis>
-    </HighchartsChart>
-    {this.input()}
-  </div>
-</center>
-          </div>
+                <Legend layout="vertical" align="right" verticalAlign="middle"/>
+                <Tooltip
+                  headerFormat="<span style='font-size: 10px'></span>"
+                  pointFormat={pointFmt}
+                />
+                <XAxis>
+                  <XAxis.Title>Episode</XAxis.Title>
+                </XAxis>
+                <YAxis id="number">
+                  <SplineSeries
+                    id="imdb"
+                    name={this.state.title}
+                    data={this.state.data}/>
+                </YAxis>
+              </HighchartsChart>
+              {this.input()}
+            </div>
+          </center>
         </div>
+      </div>
     )
   }
 }
-export default withHighcharts(App, Highcharts)
+
+export default withHighcharts(Radium(App), Highcharts)
