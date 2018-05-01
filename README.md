@@ -16,6 +16,8 @@ Inspired by http://graphtv.kevinformatics.com/ which is currently down with the 
 > Follow me @kevinwuhoo for updates.  
 > Last Updated: 01/15/18  
 
+Archive view: https://web.archive.org/web/20160206074248/http://graphtv.kevinformatics.com/
+
 <br>
 <p align="center">
 <a href="https://madnight.github.io/imdb-series-chart/">madnight.github.io/imdb-series-chart</a>
