@@ -44,7 +44,7 @@ class App extends Component {
             data: [],
             id: ''
         }
-        this.apiTimeout = 20 * 1000
+        this.apiTimeout = 30 * 1000
         this.options = {apiKey: 'db3828ef', timeout: this.apiTimeout}
         this.timeout = new Timeout()
         this.defaultTitle = "tt0141842" // The Sopranos
@@ -146,7 +146,7 @@ class App extends Component {
                         } }>
                         <HighchartsChart plotOptions={plotOptions}>
                             <Loading isLoading={!this.state.title}>
-                                { 'Fetching data...' }
+                                { 'Fetching data... <br>Takes up to 30 seconds.' }
                             </Loading>
                             <Loading
                                 isLoading={
