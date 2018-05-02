@@ -11,6 +11,7 @@ import { HighchartsChart, Chart, withHighcharts, XAxis, YAxis, Title,
 import { Line } from 'react-chartjs-2'
 import Timeout from 'await-timeout'
 import Radium from 'radium'
+import GithubCorner from 'react-github-corner'
 
 const memoize = require('fast-memoize')
 const imdb = require('imdb-api')
@@ -131,6 +132,9 @@ class App extends Component {
             " <b>Rating: {point.y}</b><br/>"
         return (
             <div className='App'>
+                <GithubCorner
+                    href="https://github.com/madnight/imdb-series-chart/"
+                />
                 <div>
                     <center>
                         <div style={ {
@@ -147,34 +151,34 @@ class App extends Component {
                             <Loading
                                 isLoading={
                                     this.state.title == "TV Show not found!"}>
-                                { "<h1>TV Show not found!</h1>" }
-                            </Loading>
-                            <Chart backgroundColor={null}/>
-                            <Title>{this.state.title}</Title>
-                            <Subtitle>Source: www.omdbapi.com</Subtitle>
-                            <Legend
-                                layout="vertical"
-                                align="right"
-                                verticalAlign="middle"/>
-                            <Tooltip
-                                headerFormat="<span style='font-size: 10px'></span>"
-                                pointFormat={pointFmt}
-                            />
-                            <XAxis>
-                                <XAxis.Title>Episode</XAxis.Title>
-                            </XAxis>
-                            <YAxis id="number">
-                                <SplineSeries
-                                    id="imdb"
-                                    name={this.state.title}
-                                    data={this.state.data}/>
-                            </YAxis>
-                        </HighchartsChart>
-                        {this.input()}
-                    </div>
-                </center>
+                                    { "<h1>TV Show not found!</h1>" }
+                                </Loading>
+                                <Chart backgroundColor={null}/>
+                                <Title>{this.state.title}</Title>
+                                <Subtitle>Source: www.omdbapi.com</Subtitle>
+                                <Legend
+                                    layout="vertical"
+                                    align="right"
+                                    verticalAlign="middle"/>
+                                <Tooltip
+                                    headerFormat="<span style='font-size: 10px'></span>"
+                                    pointFormat={pointFmt}
+                                />
+                                <XAxis>
+                                    <XAxis.Title>Episode</XAxis.Title>
+                                </XAxis>
+                                <YAxis id="number">
+                                    <SplineSeries
+                                        id="imdb"
+                                        name={this.state.title}
+                                        data={this.state.data}/>
+                                </YAxis>
+                            </HighchartsChart>
+                            {this.input()}
+                        </div>
+                    </center>
+                </div>
             </div>
-        </div>
         )
     }
 }
