@@ -51,7 +51,7 @@ class App extends Component {
     }
 
     getSeries(id) {
-        return id.substring(0, 2) == 'tt' ?
+        return id.startsWith('tt') ?
             imdb.getById(id, this.options) : imdb.get(id, this.options)
     }
 
