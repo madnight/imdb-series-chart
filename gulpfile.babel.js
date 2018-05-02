@@ -1,6 +1,6 @@
 import gulp from 'gulp'
 import htmlmin from 'gulp-htmlmin'
-import ghPages from 'gulp-gh-pages'
+import ghPages from 'gulp-gh-pages-will'
 
 gulp.task('deploy', () => gulp.src('./public/**/*').pipe(ghPages()) )
 

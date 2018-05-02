@@ -27,6 +27,7 @@
     "fast-memoize": "^2.3.2",
     "gulp": "^3.9.1",
     "gulp-gh-pages": "^0.5.4",
+    "gulp-gh-pages-will": "^0.5.5",
     "gulp-htmlmin": "^3.0.0",
     "highcharts": "^5.0.15",
     "imdb-api": "^3.1.2",
