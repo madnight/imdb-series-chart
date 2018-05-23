@@ -53,7 +53,7 @@ class App extends Component {
     }
 
     async getSeries(id) {
-        const baseURL = "http://195.201.103.59/"
+        const baseURL = "https://imdb.beuke.org/"
         const baseQuery = "series-384357a.json?sql=select+*+from+series+where+"
         const orderBy = "+order+by+CAST%28seasonNumber+as+INT%29%2C+CAST%28episodeNumber+as+INT%29"
         return id.startsWith('tt') ?
