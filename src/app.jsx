@@ -12,6 +12,7 @@ import { Line } from 'react-chartjs-2'
 import Timeout from 'await-timeout'
 import Radium from 'radium'
 import GithubCorner from 'react-github-corner'
+import axios from 'axios'
 
 const memoize = require('fast-memoize')
 const imdb = require('imdb-api')
@@ -36,6 +37,7 @@ const plotOptions = {
 }
 
 class App extends Component {
+
     constructor() {
         super()
         this.state = {
@@ -50,9 +52,14 @@ class App extends Component {
         this.defaultTitle = "tt0141842" // The Sopranos
     }
 
-    getSeries(id) {
+    async getSeries(id) {
+        const baseURL = "http://195.201.103.59/"
+        const baseQuery = "series-384357a.json?sql=select+*+from+series+where+"
+        const orderBy = "+order+by+CAST%28seasonNumber+as+INT%29%2C+CAST%28episodeNumber+as+INT%29"
         return id.startsWith('tt') ?
-            imdb.getById(id, this.options) : imdb.get(id, this.options)
+            axios.get( baseURL + baseQuery + "parentTconst+%3D+%22" + id + "%22" + orderBy)
+            : axios.get(baseURL + baseQuery + "+seriesTitle+%3D+%22" + id + "%22" + orderBy)
+
     }
 
     async getImdb(id) {
@@ -60,9 +67,7 @@ class App extends Component {
         this.setState({ data: [], title: '', labels: '' })
 
         try {
-            const timerPromise = this.timeout.set(this.apiTimeout, 'Timeout!')
-            const series = await Promise.race([this.getSeries(id), timerPromise])
-            const episodes = await Promise.race([series.episodes(), timerPromise])
+            const series = await this.getSeries(id)
 
             const pad = (number, digits) =>
                 Array(Math.max(digits - String(number).length + 1, 0)).join(0) + number
@@ -70,20 +75,21 @@ class App extends Component {
             const randomColor = memoize((i) =>
                 `#${Math.floor(Math.random() * 0x1000000).toString(16).padStart(6, 0)}`)
 
-            const ratings = episodes.map(e => ({
-                name: e.name,
-                episode: pad(e.episode, 2),
-                season: pad(e.season, 2),
-                y: parseFloat(e.rating),
-                marker: { fillColor: randomColor(e.season) }
+            const ratings = series.data.rows.map( e => ({
+                name: e[5],
+                episode: pad(e[3], 2),
+                season: pad(e[2], 2),
+                y: parseFloat(e[6]),
+                marker: { fillColor: randomColor(e[2]) }
             }))
 
             this.setState({
                 data: ratings,
-                title: series.title,
-                labels: episodes.map(e => e.name),
+                title: series.data.rows[0][4],
+                labels: "",
                 id: id
             })
+
         } catch (e) {
             this.setState({title: "TV Show not found!", id: id})
         } finally {
@@ -146,7 +152,7 @@ class App extends Component {
                         } }>
                         <HighchartsChart plotOptions={plotOptions}>
                             <Loading isLoading={!this.state.title}>
-                                { 'Fetching data... <br>Takes up to 30 seconds.' }
+                                { 'Fetching data...' }
                             </Loading>
                             <Loading
                                 isLoading={
