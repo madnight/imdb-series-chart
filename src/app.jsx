@@ -12,8 +12,10 @@ import { Line } from 'react-chartjs-2'
 import Timeout from 'await-timeout'
 import Radium from 'radium'
 import GithubCorner from 'react-github-corner'
-import axios from 'axios'
+import { Autocomplete } from 'react-materialize'
+import { flatten } from 'lodash/fp'
 
+const axios = require('axios')
 const memoize = require('fast-memoize')
 const imdb = require('imdb-api')
 
@@ -47,18 +49,21 @@ class App extends Component {
             id: ''
         }
         this.apiTimeout = 30 * 1000
-        this.options = {apiKey: 'db3828ef', timeout: this.apiTimeout}
         this.timeout = new Timeout()
         this.defaultTitle = "tt0141842" // The Sopranos
+        this.complList = {}
+        this.API = "https://imdb.beuke.org/series-384357a.json?sql="
     }
 
     async getSeries(id) {
-        const baseURL = "https://imdb.beuke.org/"
-        const baseQuery = "series-384357a.json?sql=select+*+from+series+where+"
-        const orderBy = "+order+by+CAST%28seasonNumber+as+INT%29%2C+CAST%28episodeNumber+as+INT%29"
+        const baseQuery = "select+*+from+series+where+"
+        const orderBy = "+order+by+CAST%28seasonNumber+as" +
+             "+INT%29%2C+CAST%28episodeNumber+as+INT%29"
         return id.startsWith('tt') ?
-            axios.get( baseURL + baseQuery + "parentTconst+%3D+%22" + id + "%22" + orderBy)
-            : axios.get(baseURL + baseQuery + "+seriesTitle+%3D+%22" + id + "%22" + orderBy)
+            axios.get(this.API + baseQuery +
+                "parentTconst+%3D+%22" + id + "%22" + orderBy)
+            : axios.get(this.API + baseQuery +
+                "+seriesTitle+%3D+%22" + id + "%22" + orderBy)
 
     }
 
@@ -92,17 +97,25 @@ class App extends Component {
 
         } catch (e) {
             this.setState({title: "TV Show not found!", id: id})
-        } finally {
-            this.timeout.clear()
         }
     }
 
-    componentWillMount() {
+    async componentWillMount() {
+        const completionList = (await axios
+            .get(this.API +
+                "select+DISTINCT+seriesTitle+from+series+limit+1000"))
+            .data
+            .rows
+        this.complList = flatten(completionList)
+            .reduce((r, i) => {
+                r[i] = null
+                return r
+            }, {})
         if (!this.state.title) this.getImdb(this.defaultTitle)
     }
 
     componentDidMount() {
-        if (this.nameInput) this.nameInput.focus()
+        document.getElementById("input").focus()
     }
 
     input() {
@@ -116,19 +129,19 @@ class App extends Component {
                             width: '80%',
                         }
                     } }>
-                    <div className="input-field col s12" >
-                        <input
-                            id="input"
-                            type="text"
-                            ref={ i => i && setTimeout(() => { input.focus() }, 100) }
-                            onKeyPress={ e =>
-                                    e.key === 'Enter' && this.getImdb(e.target.value) }>
-                                </input>
-                                <label htmlFor="input">Series (e.g. Lost or IMDB id)</label>
-                            </div>
-                        </div>
-                    </div>
-                </center>
+                    <Autocomplete
+                        title='Series Title or IMDB ID'
+                        id="input"
+                        onKeyPress={ e => e.key === 'Enter' && this.getImdb(e.target.value) }
+                        onAutocomplete={ v => this.getImdb(v) }
+                        minLength={ 2 }
+                        s={ 12 }
+                        limit={ 5 }
+                        data={ this.complList }
+                    />
+                </div>
+            </div>
+        </center>
         )
     }
 
