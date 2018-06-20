@@ -13,7 +13,7 @@ import Timeout from 'await-timeout'
 import Radium from 'radium'
 import GithubCorner from 'react-github-corner'
 import { Autocomplete } from 'react-materialize'
-import { flatten } from 'lodash/fp'
+import { reduce, flow, flatten, at, drop } from 'lodash/fp'
 
 const axios = require('axios')
 const memoize = require('fast-memoize')
@@ -56,14 +56,14 @@ class App extends Component {
     }
 
     async getSeries(id) {
-        const baseQuery = "select+*+from+series+where+"
-        const orderBy = "+order+by+CAST%28seasonNumber+as" +
-             "+INT%29%2C+CAST%28episodeNumber+as+INT%29"
+        const baseQuery = this.query("select * from series where ")
+        const orderBy = this.query(" order by CAST(seasonNumber as" +
+             " INT), CAST(episodeNumber as INT)")
         return id.startsWith('tt') ?
             axios.get(this.API + baseQuery +
-                "parentTconst+%3D+%22" + id + "%22" + orderBy)
+                this.query("parentTconst = \"" + id + "\"" + orderBy))
             : axios.get(this.API + baseQuery +
-                "+seriesTitle+%3D+%22" + id + "%22" + orderBy)
+                this.query(" seriesTitle = \"" + id + "\"" + orderBy))
 
     }
 
@@ -75,18 +75,25 @@ class App extends Component {
             const series = await this.getSeries(id)
 
             const pad = (number, digits) =>
-                Array(Math.max(digits - String(number).length + 1, 0)).join(0) + number
+                Array(Math.max(digits - String(number).length + 1, 0))
+                    .join(0) + number
 
             const randomColor = memoize((i) =>
-                `#${Math.floor(Math.random() * 0x1000000).toString(16).padStart(6, 0)}`)
+                `#${Math.floor(Math.random() * 0x1000000)
+                        .toString(16)
+                        .padStart(6, 0)}`)
 
-            const ratings = series.data.rows.map( e => ({
-                name: e[5],
-                episode: pad(e[3], 2),
-                season: pad(e[2], 2),
-                y: parseFloat(e[6]),
-                marker: { fillColor: randomColor(e[2]) }
-            }))
+            const ratings = series.data.rows.map( e => {
+                const [seasonNo, episodeNo, _, episode, rating]
+                    = [...(drop(2)(e))]
+                return ({
+                    name: episode,
+                    episode: pad(episodeNo, 2),
+                    season: pad(seasonNo, 2),
+                    y: parseFloat(rating),
+                    marker: { fillColor: randomColor(seasonNo) }
+                })
+            })
 
             this.setState({
                 data: ratings,
@@ -100,17 +107,22 @@ class App extends Component {
         }
     }
 
+    query(str) {
+        return str.replace(/ /g,"+")
+    }
+
     async componentWillMount() {
-        const completionList = (await axios
-            .get(this.API +
-                "select+DISTINCT+seriesTitle+from+series+limit+1000"))
-            .data
-            .rows
-        this.complList = flatten(completionList)
-            .reduce((r, i) => {
+        this.complList = flow(
+            at("data.rows"),
+            flatten,
+            reduce((r, i) => {
                 r[i] = null
                 return r
-            }, {})
+            }, {}))((
+            await axios
+            .get((this.API +
+                this.query("select DISTINCT seriesTitle from series limit 1000")
+            ))))
         if (!this.state.title) this.getImdb(this.defaultTitle)
     }
 
@@ -132,7 +144,8 @@ class App extends Component {
                     <Autocomplete
                         title='Series Title or IMDB ID'
                         id="input"
-                        onKeyPress={ e => e.key === 'Enter' && this.getImdb(e.target.value) }
+                        onKeyPress={ e => e.key === 'Enter'
+                                && this.getImdb(e.target.value) }
                         onAutocomplete={ v => this.getImdb(v) }
                         minLength={ 2 }
                         s={ 12 }
@@ -180,7 +193,8 @@ class App extends Component {
                                     align="right"
                                     verticalAlign="middle"/>
                                 <Tooltip
-                                    headerFormat="<span style='font-size: 10px'></span>"
+                                    headerFormat=
+                                    "<span style='font-size: 10px'></span>"
                                     pointFormat={pointFmt}
                                 />
                                 <XAxis>
