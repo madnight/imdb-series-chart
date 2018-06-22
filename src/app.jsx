@@ -14,9 +14,9 @@ import Radium from 'radium'
 import GithubCorner from 'react-github-corner'
 import { Autocomplete } from 'react-materialize'
 import { reduce, flow, flatten, at, drop } from 'lodash/fp'
+import { randomColor, pad, query } from 'utils'
 
 const axios = require('axios')
-const memoize = require('fast-memoize')
 const imdb = require('imdb-api')
 
 const plotOptions = {
@@ -56,14 +56,14 @@ class App extends Component {
     }
 
     async getSeries(id) {
-        const baseQuery = this.query("select * from series where ")
-        const orderBy = this.query(" order by CAST(seasonNumber as" +
+        const baseQuery = query("select * from series where ")
+        const orderBy = query(" order by CAST(seasonNumber as" +
              " INT), CAST(episodeNumber as INT)")
         return id.startsWith('tt') ?
             axios.get(this.API + baseQuery +
-                this.query("parentTconst = \"" + id + "\"" + orderBy))
+                query("parentTconst = \"" + id + "\"" + orderBy))
             : axios.get(this.API + baseQuery +
-                this.query(" seriesTitle = \"" + id + "\"" + orderBy))
+                query(" seriesTitle = \"" + id + "\"" + orderBy))
 
     }
 
@@ -73,15 +73,6 @@ class App extends Component {
 
         try {
             const series = await this.getSeries(id)
-
-            const pad = (number, digits) =>
-                Array(Math.max(digits - String(number).length + 1, 0))
-                    .join(0) + number
-
-            const randomColor = memoize((i) =>
-                `#${Math.floor(Math.random() * 0x1000000)
-                        .toString(16)
-                        .padStart(6, 0)}`)
 
             const ratings = series.data.rows.map( e => {
                 const [seasonNo, episodeNo, _, episode, rating]
@@ -107,10 +98,6 @@ class App extends Component {
         }
     }
 
-    query(str) {
-        return str.replace(/ /g,"+")
-    }
-
     async componentWillMount() {
         this.complList = flow(
             at("data.rows"),
@@ -121,7 +108,7 @@ class App extends Component {
             }, {}))((
             await axios
             .get((this.API +
-                this.query("select DISTINCT seriesTitle from series limit 1000")
+                query("select DISTINCT seriesTitle from series limit 1000")
             ))))
         if (!this.state.title) this.getImdb(this.defaultTitle)
     }
