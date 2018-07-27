@@ -1,11 +1,15 @@
 <p align="center">
     <h1 align="center">IMDB Series Chart<br></h1>
-</p><br><br>
+</p>
 
+<p align=center>
+<a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-brightgreen.svg" alt="License: MIT" /></a>
+<a href="https://codeclimate.com/github/madnight/imdb-series-chart"><img src="https://codeclimate.com/github/madnight/imdb-series-chart/badges/gpa.svg" alt="Code Climate"></a>
+<a href="https://codeclimate.com/github/madnight/imdb-series-chart"><img src="https://codeclimate.com/github/madnight/imdb-series-chart/badges/issue_count.svg" alt="Issue Count"></a>
+<a href="https://david-dm.org/madnight/imdb-series-chart"><img src="https://david-dm.org/madnight/imdb-series-chart/status.svg" alt="dependencies Status"></a>
+<a href="https://snyk.io/test/github/madnight/imdb-series-chart"><img src="https://snyk.io/test/github/madnight/imdb-series-chart/badge.svg" alt="Known Vulnerabilities"></a>
 
 ![alt text](https://i.imgur.com/5ZKSN0C.png)
-
-
 
 
 Show the IMDB ranking and titles of a television series.  
