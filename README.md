@@ -13,6 +13,9 @@
 
 
 Show the IMDB ranking and titles of a television series.  
+
+Backend API: https://github.com/madnight/yaimdba
+
 Inspired by http://graphtv.kevinformatics.com/ which is currently down with the following message:
 
 > Graph TV is currently offline.  
