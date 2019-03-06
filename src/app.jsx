@@ -14,7 +14,7 @@ import Radium from 'radium'
 import GithubCorner from 'react-github-corner'
 import { Autocomplete } from 'react-materialize'
 import { reduce, flow, flatten, at, drop } from 'lodash/fp'
-import { randomColor, pad, query } from 'utils'
+import { randomColor, pad, query } from './utils'
 
 const axios = require('axios')
 const imdb = require('imdb-api')
