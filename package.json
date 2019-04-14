@@ -30,7 +30,7 @@
     "gulp-gh-pages": "^0.5.4",
     "gulp-gh-pages-will": "^0.5.5",
     "gulp-htmlmin": "^3.0.0",
-    "highcharts": "^5.0.15",
+    "highcharts": "^6.1.0",
     "imdb-api": "^3.1.2",
     "inquirer-confirm": "^2.0.2",
     "lodash": "^4.17.10",
@@ -42,7 +42,7 @@
     "react-chartjs-2": "^2.7.0",
     "react-dom": "^16.3.2",
     "react-github-corner": "^2.3.0",
-    "react-jsx-highcharts": "^2.2.1",
+    "react-jsx-highcharts": "^3.4.0",
     "react-materialize": "^2.2.1"
   },
   "devDependencies": {
