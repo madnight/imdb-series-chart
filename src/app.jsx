@@ -1,23 +1,23 @@
-import React, { Component } from 'react'
-import Navigation from './components/Navigation'
 import 'normalize.css'
-import "styles/base/_main.sass"  // Global styles
-import "styles/base/_common.sass"  // Global styles
-import styles from "./app.css"  // Css-module styles
-import Highcharts from 'highcharts'
+import "styles/base/_main.sass"
+import "styles/base/_common.sass"
+
+import GithubCorner                        from 'react-github-corner'
+import Highcharts                          from 'highcharts'
+import Navigation                          from './components/Navigation'
+import Radium                              from 'radium'
+import Timeout                             from 'await-timeout'
+import axios                               from 'axios'
+import imdb                                from 'imdb-api'
+import styles                              from "./app.css"
+import React, { Component }                from 'react'
+import { Autocomplete }                    from 'react-materialize'
+import { reduce, flow, flatten, at, drop } from 'lodash/fp'
+import { randomColor, pad, query }         from './utils'
+import { Line }                            from 'react-chartjs-2'
 import { HighchartsChart, Chart, withHighcharts, XAxis, YAxis, Title,
     Subtitle, Legend, LineSeries, SplineSeries, Tooltip, Loading
 } from 'react-jsx-highcharts'
-import { Line } from 'react-chartjs-2'
-import Timeout from 'await-timeout'
-import Radium from 'radium'
-import GithubCorner from 'react-github-corner'
-import { Autocomplete } from 'react-materialize'
-import { reduce, flow, flatten, at, drop } from 'lodash/fp'
-import { randomColor, pad, query } from './utils'
-
-const axios = require('axios')
-const imdb = require('imdb-api')
 
 const plotOptions = {
     spline: {
