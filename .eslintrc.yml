@@ -8,12 +8,9 @@
     es6: true
     jest: true
 
-  indent:
-    - error
-    - 4
 
   parserOptions:
-   ecmaVersion: 6
+   ecmaVersion: 2017
    sourceType: "module"
    ecmaFeatures:
     jsx: true
@@ -26,6 +23,9 @@
     - react
     - jest
   rules:
+    indent:
+       - error
+       - 4
     react/jsx-uses-vars: 1
     react/prop-types: [1, { ignore: [children] }]
 

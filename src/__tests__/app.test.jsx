@@ -6,7 +6,7 @@ import Routes from '../routes';
 configure({ adapter: new Adapter() });
 
 describe('app', () => {
-  it('renders without crashing', () => {
-    mount(<Routes />);
-  });
+    it('renders without crashing', () => {
+        mount(<Routes />);
+    });
 });

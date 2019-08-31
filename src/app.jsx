@@ -4,20 +4,17 @@ import "styles/base/_common.sass"
 
 import GithubCorner                        from 'react-github-corner'
 import Highcharts                          from 'highcharts'
-import Navigation                          from './components/Navigation'
 import Radium                              from 'radium'
 import Timeout                             from 'await-timeout'
 import axios                               from 'axios'
-import imdb                                from 'imdb-api'
-import styles                              from "./app.css"
 import React, { Component }                from 'react'
 import { Autocomplete }                    from 'react-materialize'
 import { reduce, flow, flatten, at, drop } from 'lodash/fp'
 import { randomColor, pad, query }         from './utils'
-import { Line }                            from 'react-chartjs-2'
-import { HighchartsChart, Chart, withHighcharts, XAxis, YAxis, Title,
-    Subtitle, Legend, LineSeries, SplineSeries, Tooltip, Loading
-} from 'react-jsx-highcharts'
+import { HighchartsChart, Chart,
+    withHighcharts, XAxis, YAxis, Title,
+    Subtitle, Legend, SplineSeries,
+    Tooltip, Loading }                     from 'react-jsx-highcharts'
 
 const plotOptions = {
     spline: {
@@ -64,17 +61,17 @@ class App extends Component {
                 query("parentTconst = \"" + id + "\"" + orderBy))
             : axios.get(this.API + baseQuery +
                 query(" seriesTitle = \"" + id + "\"" + orderBy))
-
     }
 
     async getImdb(id) {
-        if (id == this.state.id) return
+        if (id === this.state.id) return
         this.setState({ data: [], title: '', labels: '' })
 
         try {
             const series = await this.getSeries(id)
 
             const ratings = series.data.rows.map( e => {
+                /* eslint-disable no-unused-vars */
                 const [seasonNo, episodeNo, _, episode, rating]
                     = [...(drop(2)(e))]
                 return ({
@@ -98,7 +95,7 @@ class App extends Component {
         }
     }
 
-    async componentWillMount() {
+    async componentDidMount() {
         this.complList = flow(
             at("data.rows"),
             flatten,
@@ -107,14 +104,11 @@ class App extends Component {
                 return r
             }, {}))((
             await axios
-            .get((this.API +
+                .get((this.API +
                 query("select DISTINCT seriesTitle from series limit 1000")
-            ))))
-        if (!this.state.title) this.getImdb(this.defaultTitle)
-    }
-
-    componentDidMount() {
+                ))))
         document.getElementById("input").focus()
+        if (!this.state.title) this.getImdb(this.defaultTitle)
     }
 
     input() {
@@ -123,25 +117,25 @@ class App extends Component {
                 <div className="row">
                     <div style={ {
                         width: '40%',
-                        marginTop: 40 ,
+                        marginTop: 40,
                         '@media (max-width: 768px)': {
                             width: '80%',
                         }
                     } }>
-                    <Autocomplete
-                        title='Series Title or IMDB ID'
-                        id="input"
-                        onKeyPress={ e => e.key === 'Enter'
+                        <Autocomplete
+                            title='Series Title or IMDB ID'
+                            id="input"
+                            onKeyPress={ e => e.key === 'Enter'
                                 && this.getImdb(e.target.value) }
-                        onAutocomplete={ v => this.getImdb(v) }
-                        minLength={ 2 }
-                        s={ 12 }
-                        limit={ 5 }
-                        data={ this.complList }
-                    />
+                            onAutocomplete={ v => this.getImdb(v) }
+                            minLength={ 2 }
+                            s={ 12 }
+                            limit={ 5 }
+                            data={ this.complList }
+                        />
+                    </div>
                 </div>
-            </div>
-        </center>
+            </center>
         )
     }
 
@@ -163,13 +157,13 @@ class App extends Component {
                                 width: '100%',
                             }
                         } }>
-                        <HighchartsChart plotOptions={plotOptions}>
-                            <Loading isLoading={!this.state.title}>
-                                { 'Fetching data...' }
-                            </Loading>
-                            <Loading
-                                isLoading={
-                                    this.state.title == "TV Show not found!"}>
+                            <HighchartsChart plotOptions={plotOptions}>
+                                <Loading isLoading={!this.state.title}>
+                                    { 'Fetching data...' }
+                                </Loading>
+                                <Loading
+                                    isLoading={
+                                        this.state.title === "TV Show not found!"}>
                                     { "<h1>TV Show not found!</h1>" }
                                 </Loading>
                                 <Chart backgroundColor={null}/>
@@ -181,7 +175,7 @@ class App extends Component {
                                     verticalAlign="middle"/>
                                 <Tooltip
                                     headerFormat=
-                                    "<span style='font-size: 10px'></span>"
+                                        "<span style='font-size: 10px'></span>"
                                     pointFormat={pointFmt}
                                 />
                                 <XAxis>
