@@ -20,11 +20,10 @@
   "license": "MIT",
   "homepage": "https://github.com/ReactJSResources/react-webpack-babel#readme",
   "dependencies": {
-    "await-timeout": "^0.6.0",
+    "await-timeout": "^1.1.1",
     "axios": "^0.21.1",
     "babel-polyfill": "6.26.0",
     "babel-preset-stage-2": "^6.24.1",
-    "chart.js": "^2.7.2",
     "fast-memoize": "^2.3.2",
     "highcharts": "^9.0.0",
     "lodash": "^4.17.15",
