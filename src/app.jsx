@@ -125,13 +125,16 @@ class App extends Component {
                         <Autocomplete
                             title='Series Title or IMDB ID'
                             id="input"
+                            options={{
+                              data: this.complList,
+                              onAutocomplete: v => this.getImdb(v),
+                              minLength: 2,
+                            }}
                             onKeyPress={ e => e.key === 'Enter'
                                 && this.getImdb(e.target.value) }
-                            onAutocomplete={ v => this.getImdb(v) }
                             minLength={ 2 }
                             s={ 12 }
                             limit={ 5 }
-                            data={ this.complList }
                         />
                     </div>
                 </div>
