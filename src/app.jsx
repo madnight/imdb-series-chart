@@ -37,8 +37,8 @@ const plotOptions = {
 
 class App extends Component {
 
-    constructor() {
-        super()
+    constructor(props) {
+        super(props)
         this.state = {
             labels: [],
             title: '',
@@ -126,9 +126,9 @@ class App extends Component {
                             title='Series Title or IMDB ID'
                             id="input"
                             options={{
-                              data: this.complList,
-                              onAutocomplete: v => this.getImdb(v),
-                              minLength: 2,
+                                data: this.complList,
+                                onAutocomplete: v => this.getImdb(v),
+                                minLength: 2,
                             }}
                             onKeyPress={ e => e.key === 'Enter'
                                 && this.getImdb(e.target.value) }
