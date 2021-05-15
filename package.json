@@ -6,8 +6,7 @@
   "scripts": {
     "build": "webpack --config webpack.production.config.js --progress --profile --colors",
     "serve:build": "npm run build && node server.js",
-    "start": "webpack-dev-server --progress --colors --content-base src --inline --hot --verbose",
-    "dev": "npm run start",
+    "dev": "webpack-dev-server --progress --colors --content-base src --inline --hot --verbose",
     "deploy": "npm run build && gh-pages -d public",
     "lint": "eslint --ext js --ext jsx src --fix || exit 0",
     "test": "export NODE_ENV=test && jest"
@@ -33,7 +32,7 @@
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-github-corner": "^2.3.0",
-    "react-jsx-highcharts": "^3.6.1",
+    "react-jsx-highcharts": "^4.2.1",
     "react-materialize": "^3.9.8"
   },
   "devDependencies": {
