@@ -7,7 +7,7 @@
 <a href="https://codeclimate.com/github/madnight/imdb-series-chart"><img src="https://codeclimate.com/github/madnight/imdb-series-chart/badges/gpa.svg" alt="Code Climate"></a>
 <a href="https://codeclimate.com/github/madnight/imdb-series-chart"><img src="https://codeclimate.com/github/madnight/imdb-series-chart/badges/issue_count.svg" alt="Issue Count"></a>
 <a href="https://david-dm.org/madnight/imdb-series-chart"><img src="https://img.shields.io/david/madnight/imdb-series-chart?cacheSeconds=3600" alt="dependencies Status" /></a>
-<a href="https://snyk.io/test/github/madnight/imdb-series-chart"><img src="https://snyk.io/test/github/madnight/imdb-series-chart/badge.svg" alt="Known Vulnerabilities"></a>
+<a href="https://snyk.io/test/github/madnight/imdb-series-chart"><img height="20" src="https://images.weserv.nl/?url=https://img.shields.io/snyk/vulnerabilities/github/madnight/imdb-series-chart?cacheSeconds=3600&l=0&output=png&w=1000" alt="Known Vulnerabilities"></a>
 <a href="https://github.com/prettier/prettier"><img src="https://img.shields.io/badge/code_style-prettier-blue.svg" alt="Code Style"></a>
 
 
