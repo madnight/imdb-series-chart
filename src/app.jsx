@@ -49,7 +49,7 @@ class App extends Component {
         this.timeout = new Timeout()
         this.defaultTitle = "tt0141842" // The Sopranos
         this.complList = {}
-        this.API = "https://imdb.beuke.org/series-384357a.json?sql="
+        this.API = "https://imdb.beuke.org/series.json?sql="
     }
 
     async getSeries(id) {
