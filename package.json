@@ -20,7 +20,7 @@
   "homepage": "https://github.com/ReactJSResources/react-webpack-babel#readme",
   "dependencies": {
     "await-timeout": "^1.1.1",
-    "axios": "^0.21.1",
+    "axios": "^1.6.0",
     "babel-polyfill": "6.26.0",
     "babel-preset-stage-2": "^6.24.1",
     "fast-memoize": "^2.3.2",
